@@ -15,7 +15,7 @@ class BasicGit:
             root_path
         )  # get the full folder path where our code lives
         self.gitdir = os.path.join(
-            self.root_path, ".basicgit"
+            self.root_path, ".basicgit1"
         )  # create a hidden folder to store all Git data #* add hint & leave incomplete
         self.refs_dir = os.path.join(
             self.gitdir, "refs"
@@ -30,6 +30,9 @@ class BasicGit:
         self.objects_dir = os.path.join(
             self.gitdir, "objects"
         )  # folder where all saved files and changes are stored
+        self.index_file = os.path.join(
+            self.gitdir, "index"
+        )  # file to track staged files
 
     def init(self):
         """Initialize a new repository."""
@@ -52,6 +55,10 @@ class BasicGit:
             f.write(
                 ""
             )  # Start with no commits - we'll add them when changes are saved #* add hint & leave incomplete
+
+        # Create an empty index file to track staged files
+        with open(self.index_file, "w") as f:
+            f.write("")
 
         print(f"Initialized empty repository in {self.gitdir}")
 
@@ -95,29 +102,36 @@ class BasicGit:
             print(f"Error: {path} does not exist")
             return
 
-        # Get the current content of the file
-        with open(abs_path, "r") as f:
-            content = f.read()  # * add hint & leave incomplete
-        # Simply store the content in the staging area
-        self.staged_content = {path: content}
+        # Store the path of the added file in the index file
+        with open(self.index_file, "w") as f:
+            f.write(path)
 
         print(f"Added {path}")
 
     def commit(self, message):
         """Save the staged changes with a message for clarity."""
-        # Check if there's anything staged to commit
-        if not hasattr(self, "staged_content") or not self.staged_content:
+        # Check if there's anything staged to commit by reading the index file
+        try:
+            with open(self.index_file, "r") as f:
+                staged_path = f.read().strip()
+        except FileNotFoundError:
             print("No changes to commit")
             return
 
-        # For simplicity in Stage 1, we're only handling one added file
-        if len(self.staged_content) != 1:
-            print(
-                "Error: Please add exactly one file before committing in this version."
-            )
+        if not staged_path:
+            print("No changes to commit")
             return
 
-        path, content = list(self.staged_content.items())[0]
+        abs_staged_path = os.path.abspath(staged_path)
+        if not os.path.exists(abs_staged_path):
+            print(f"Error: Staged file '{staged_path}' not found.")
+            # Clear the index
+            with open(self.index_file, "w") as f:
+                f.write("")
+            return
+
+        with open(abs_staged_path, "r") as f:
+            content = f.read()
         # Create a "blob" by hashing the content
         blob_sha = self._hash_object(content)
         self._store_object(content, blob_sha)  # save the content
@@ -126,7 +140,7 @@ class BasicGit:
         commit_data = {
             "message": message,
             "timestamp": int(time.time()),
-            "file": {path: blob_sha},
+            "file": {staged_path: blob_sha},
         }
 
         # Convert the commit data to text and save it with its own unique ID
@@ -142,7 +156,10 @@ class BasicGit:
 
         # Show a confirmation message with the commit ID and message
         print(f"[{self.main_branch} {commit_sha[:7]}] {message}")
-        del self.staged_content  # Clear staging after commit
+
+        # Clear the index after a successful commit
+        with open(self.index_file, "w") as f:
+            f.write("")
 
 
 if __name__ == "__main__":

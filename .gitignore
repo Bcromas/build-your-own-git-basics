@@ -174,3 +174,7 @@ cython_debug/
 .pypirc
 
 *.txt
+
+*.basicgit1
+*.basicgit2
+*.basicgit3
