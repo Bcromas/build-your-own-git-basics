@@ -30,7 +30,9 @@ class BasicGit:
         self.objects_dir = os.path.join(
             self.gitdir, "objects"
         )  # folder where all saved files and changes are stored
-        self.index_file = os.path.join(self.gitdir, "index") # file to track staged files
+        self.index_file = os.path.join(
+            self.gitdir, "index"
+        )  # file to track staged files
 
     def init(self):
         """Initialize a new repository."""
@@ -93,22 +95,6 @@ class BasicGit:
                 data
             )  # save the actual content to disk for later retrieval #* add hint & leave incomplete
 
-    # def add(self, path):
-    #     """Add a file to be tracked."""
-    #     abs_path = os.path.abspath(path)
-    #     if not os.path.exists(abs_path):
-    #         print(f"Error: {path} does not exist")
-    #         return
-
-    #     # Get the current content of the file
-    #     with open(abs_path, "r") as f:
-    #         content = f.read()  # * add hint & leave incomplete
-        
-    #     # Store the path of the added files in the index file
-    #     with open(self.index_file, "w") as f:
-    #         f.write(path)
-
-    #     print(f"Added {path}")
     def add(self, path):
         """Add a file to be tracked."""
         abs_path = os.path.abspath(path)
@@ -122,46 +108,6 @@ class BasicGit:
 
         print(f"Added {path}")
 
-    # def commit(self, message):
-    #     """Save the staged changes with a message for clarity."""
-    #     # Check if there's anything staged to commit
-    #     if not hasattr(self, "staged_content") or not self.staged_content:
-    #         print("No changes to commit")
-    #         return
-
-    #     # For simplicity in Stage 1, we're only handling one added file
-    #     if len(self.staged_content) != 1:
-    #         print(
-    #             "Error: Please add exactly one file before committing in this version."
-    #         )
-    #         return
-
-    #     path, content = list(self.staged_content.items())[0]
-    #     # Create a "blob" by hashing the content
-    #     blob_sha = self._hash_object(content)
-    #     self._store_object(content, blob_sha)  # save the content
-
-    #     # Create a commit object with message, timestamp, and file information
-    #     commit_data = {
-    #         "message": message,
-    #         "timestamp": int(time.time()),
-    #         "file": {path: blob_sha},
-    #     }
-
-    #     # Convert the commit data to text and save it with its own unique ID
-    #     commit_string = str(commit_data)
-    #     # Hash the commit string
-    #     commit_sha = self._hash_object(commit_string)
-    #     self._store_object(commit_string, commit_sha)  # save the commit string and hash
-
-    #     # Update the branch to point to this new commit
-    #     main_branch_path = os.path.join(self.heads_dir, self.main_branch)
-    #     with open(main_branch_path, "w") as f:
-    #         f.write(commit_sha)  # point the branch to the new commit
-
-    #     # Show a confirmation message with the commit ID and message
-    #     print(f"[{self.main_branch} {commit_sha[:7]}] {message}")
-    #     del self.staged_content  # Clear staging after commit
     def commit(self, message):
         """Save the staged changes with a message for clarity."""
         # Check if there's anything staged to commit by reading the index file
