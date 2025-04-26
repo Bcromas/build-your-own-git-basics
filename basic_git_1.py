@@ -185,11 +185,11 @@ if __name__ == "__main__":
     basic_git = BasicGit()
 
     if args.command == "init":
-        basic_git.init()
+        basic_git.init() #* creates a hidden folder named .basicgit1 which contains index (empty), HEAD (has one entry for 'refs/heads/main'), objects/, & refs/heads/main (empty)
     elif args.command == "add":
-        basic_git.add(args.path)
+        basic_git.add(args.path) #* adds an entry in index for the file path of the file specified
     elif args.command == "commit":
-        basic_git.commit(args.message)
+        basic_git.commit(args.message) #* adds dirs to objects/ one for the file specified & one for the commit message, an entry in refs/heads/main using the hash of the commit message stored in objects, clears content in index, and prints out the branch name plus the first 7 digits of the hash plus the commit message
     elif args.command is None:
         parser.print_help()
         sys.exit(1)
