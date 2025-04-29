@@ -8,7 +8,7 @@ import time
 class BasicGit:
     def __init__(self, root_path="."):
         """
-        Set up a new Git-like system to track changes to files.
+        Set up a Git-like system to track changes to files.
         This creates a basic folder structure to store versions of our code.
         """
         self.root_path = os.path.abspath(
@@ -45,16 +45,14 @@ class BasicGit:
         os.makedirs(self.objects_dir, exist_ok=True)  # * add hint & leave incomplete
         os.makedirs(self.heads_dir, exist_ok=True)  # * add hint & leave incomplete
 
-        # Create a HEAD file that points to our main branch - this is like a bookmark showing where we are
+        # Create a HEAD file that points to our main branch
         with open(self.HEAD_file, "w") as f:
             f.write(f"refs/heads/{self.main_branch}")  # * add hint & leave incomplete
 
         # Create an empty main branch file - it's empty because we haven't saved any changes yet
         main_branch_path = os.path.join(self.heads_dir, self.main_branch)
         with open(main_branch_path, "w") as f:
-            f.write(
-                ""
-            )  # Start with no commits - we'll add them when changes are saved #* add hint & leave incomplete
+            f.write("")  # Start with no commits #* add hint & leave incomplete
 
         # Create an empty index file to track staged files
         with open(self.index_file, "w") as f:
@@ -185,7 +183,7 @@ if __name__ == "__main__":
     basic_git = BasicGit()
 
     if args.command == "init":
-        basic_git.init()  # * creates a hidden folder named .basicgit1 which contains index (empty), HEAD (has one entry for 'refs/heads/main'), objects/, & refs/heads/main (empty)
+        basic_git.init()  # * creates a hidden folder named .basicgit1 which contains index, HEAD (has one entry for 'refs/heads/main'), objects/, & refs/heads/main
     elif args.command == "add":
         basic_git.add(
             args.path
