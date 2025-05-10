@@ -133,33 +133,41 @@ class BasicGit:
 
     def commit(self, message):
         """Record changes to the repository."""
+        staged_files = []
         try:
             with open(self.index_file, "r") as f:
-                staged_path = f.read().strip()
+                staged_files = [line.strip() for line in f.readlines() if line.strip()]  # Read all staged files
         except FileNotFoundError:
             print("No changes to commit")
             return
 
-        if not staged_path:
+        if not staged_files:
             print("No changes to commit")
             return
 
-        abs_staged_path = os.path.abspath(staged_path)
-        if not os.path.exists(abs_staged_path):
-            print(f"Error: Staged file '{staged_path}' not found.")
-            with open(self.index_file, "w") as f:
-                f.write("")
-            return
+        files_to_commit = {}
+        for staged_path in staged_files:
+            abs_staged_path = os.path.abspath(staged_path)
+            if not os.path.exists(abs_staged_path):
+                print(f"Error: Staged file '{staged_path}' not found.")
+                continue  # Skip missing files, process the rest
+            try:
+                with open(abs_staged_path, "r") as f:
+                    content = f.read()
+                blob_sha = self._hash_object(content)
+                self._store_object(content, blob_sha)
+                files_to_commit[staged_path] = blob_sha
+            except Exception as e:
+                print(f"Error processing file '{staged_path}': {e}")
 
-        with open(abs_staged_path, "r") as f:
-            content = f.read()
-        blob_sha = self._hash_object(content)
-        self._store_object(content, blob_sha)
+        if not files_to_commit:  # Check if any files were actually committed
+            print("No valid files to commit.")
+            return
 
         commit_data = {
             "message": message,
             "timestamp": int(time.time()),
-            "file": {staged_path: blob_sha},
+            "files": files_to_commit,
             "parent": self._get_current_commit(),
         }
 
@@ -171,15 +179,14 @@ class BasicGit:
         if current_branch:
             branch_path = os.path.join(self.heads_dir, current_branch)
             with open(branch_path, "w") as f:
-                f.write(commit_sha)  # Update the branch to point to the new commit
+                f.write(commit_sha)
             print(f"[{current_branch} {commit_sha[:7]}] {message}")
         else:
-            print(
-                f"[detached HEAD {commit_sha[:7]}] {message}"
-            )  # Handle detached HEAD state
+            print(f"[detached HEAD {commit_sha[:7]}] {message}")
 
         with open(self.index_file, "w") as f:
             f.write("")  # Clear the index after commit
+
 
     def branch(self, name=None, delete=None):
         """List, create, or delete branches."""
@@ -338,8 +345,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    raise Exception('resolve issue with commit command')
-
     basic_git = BasicGit()
 
     if args.command == "init":
@@ -347,7 +352,7 @@ if __name__ == "__main__":
     elif args.command == "add":
         basic_git.add(args.path)
     elif args.command == "commit":
-        basic_git.commit(args.message)
+        basic_git.commit(args.message) # * handle multiple files
     elif args.command == "branch":
         basic_git.branch(
             name=args.name, delete=args.delete_branch
