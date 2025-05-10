@@ -19,20 +19,20 @@ class BasicGit:
         )  # create a hidden folder to store all Git data #* add hint & leave incomplete
         self.refs_dir = os.path.join(
             self.gitdir, "refs"
-        )  # folder to store information about saved versions #* add hint & leave incomplete
+        )  # directory for organizing references #* add hint & leave incomplete
         self.heads_dir = os.path.join(
             self.refs_dir, "heads"
-        )  # folder to keep track of different branches #* add hint & leave incomplete
+        )  # directory to store the tip of the main development line  #* add hint & leave incomplete
         self.HEAD_file = os.path.join(
             self.gitdir, "HEAD"
-        )  # special file that tells us which branch we're currently using
-        self.main_branch = "main"  # the default branch name we start with #* add hint & leave incomplete
+        )  # file indicating the currently active branch
+        self.main_branch = "main"  # the default name for the initial branch #* add hint & leave incomplete
         self.objects_dir = os.path.join(
             self.gitdir, "objects"
-        )  # folder where all saved files and changes are stored
+        )  # directory to store all committed objects
         self.index_file = os.path.join(
             self.gitdir, "index"
-        )  # file to track staged files
+        )  # file to (temporarily) track staged files
 
     def init(self):
         """Initialize a new repository."""
@@ -161,7 +161,9 @@ class BasicGit:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="A basic Git-like tool (v1)")
+    parser = argparse.ArgumentParser(
+        description="A basic Git-like tool (v1 - single file tracking)"
+    )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # 'init' command

@@ -21,20 +21,20 @@ class BasicGit:
         )  # create a hidden folder to store all Git data #* add hint & leave incomplete
         self.refs_dir = os.path.join(
             self.gitdir, "refs"
-        )  # folder to store information about saved versions #* add hint & leave incomplete
+        )  # directory for organizing references #* add hint & leave incomplete
         self.heads_dir = os.path.join(
             self.refs_dir, "heads"
-        )  # folder to keep track of different branches #* add hint & leave incomplete
+        )  # directory to store the tip of the main development line as a file containing its latest commit SHA #* add hint & leave incomplete
         self.HEAD_file = os.path.join(
             self.gitdir, "HEAD"
-        )  # special file that tells us which branch we're currently using
-        self.main_branch = "main"  # the default branch name we start with #* add hint & leave incomplete
+        )  # file indicating the currently active branch
+        self.main_branch = "main"  # the default name for the initial branch #* add hint & leave incomplete
         self.objects_dir = os.path.join(
             self.gitdir, "objects"
-        )  # folder where all saved files and changes are stored
+        )  # directory to store all committed objects
         self.index_file = os.path.join(
             self.gitdir, "index"
-        )  # file to track staged files
+        )  # file to (temporarily) track staged files
 
     def init(self):
         """Initialize a new repository."""
@@ -64,7 +64,9 @@ class BasicGit:
 
         print(f"Initialized empty repository in {self.gitdir}")
 
-    def _hash_object(self, data, obj_type="blob"):  # * add hint & leave incomplete re: new obj_type param
+    def _hash_object(
+        self, data, obj_type="blob"
+    ):  # * add hint & leave incomplete re: new obj_type param
         """
         Create a unique ID for the data using SHA-1 hashing, including object type.
         This converts any content into a fixed-length string of characters
@@ -89,14 +91,18 @@ class BasicGit:
         Save content in Git's storage system using its unique ID (hash), compressed.
         We'll organize files into folders based on the first two characters of the hash to avoid having too many files in one place.
         """
-        obj_dir = os.path.join(self.objects_dir, sha[:2]) # use first 2 characters of hash as folder name
-        obj_path = os.path.join(obj_dir, sha[2:]) # use rest of hash as the filename
-        os.makedirs(obj_dir, exist_ok=True) # create the folder if it doesn't exist
-        # storing as blob with header and compressed 
-        compressed_data = zlib.compress(f"{obj_type} {len(data)}\0{data}".encode("utf-8")) #* add hint & leave incomplete
-        # save the compressed content to disk for later retrieval 
+        obj_dir = os.path.join(
+            self.objects_dir, sha[:2]
+        )  # use first 2 characters of hash as folder name
+        obj_path = os.path.join(obj_dir, sha[2:])  # use rest of hash as the filename
+        os.makedirs(obj_dir, exist_ok=True)  # create the folder if it doesn't exist
+        # storing as blob with header and compressed
+        compressed_data = zlib.compress(
+            f"{obj_type} {len(data)}\0{data}".encode("utf-8")
+        )  # * add hint & leave incomplete
+        # save the compressed content to disk for later retrieval
         with open(obj_path, "wb") as f:
-            f.write(compressed_data) #* add hint & leave incomplete
+            f.write(compressed_data)  # * add hint & leave incomplete
 
     def _read_object(self, sha):
         """Read and decompress an object from the objects database."""
@@ -124,7 +130,7 @@ class BasicGit:
                 if not os.path.exists(abs_path):
                     print(f"Error: {path} does not exist")
                     continue
-                f.write(path + "\n") # * add hint & leave incomplete
+                f.write(path + "\n")  # * add hint & leave incomplete
                 print(f"Added {path}")
 
     def _get_current_commit(self):
@@ -174,13 +180,17 @@ class BasicGit:
             "message": message,
             "timestamp": int(time.time()),
             "files": commit_files,
-            "parent": self._get_current_commit(), # * add hint & leave incomplete
+            "parent": self._get_current_commit(),  # * add hint & leave incomplete
         }
 
         commit_string = json.dumps(commit_data)
-        commit_sha = self._hash_object(commit_string, obj_type="commit") # * add hint & leave incomplete
+        commit_sha = self._hash_object(
+            commit_string, obj_type="commit"
+        )  # * add hint & leave incomplete
         # Store commit as 'commit' object
-        self._store_object(commit_string, commit_sha, obj_type="commit")  # * add hint & leave incomplete
+        self._store_object(
+            commit_string, commit_sha, obj_type="commit"
+        )  # * add hint & leave incomplete
 
         main_branch_path = os.path.join(self.heads_dir, self.main_branch)
         with open(main_branch_path, "w") as f:
@@ -195,7 +205,9 @@ class BasicGit:
         """Show the working tree status."""
         try:
             with open(self.index_file, "r") as f:
-                staged_files = [line.strip() for line in f if line.strip()] # * add hint & leave incomplete
+                staged_files = [
+                    line.strip() for line in f if line.strip()
+                ]  # * add hint & leave incomplete
         except FileNotFoundError:
             staged_files = []
 
@@ -225,7 +237,7 @@ class BasicGit:
                 for file, sha in commit_data.get("files", {}).items():
                     print(f"  {file}: {sha[:7]}")
                 print("")
-                return commit_data.get("parent") # * add hint & leave incomplete
+                return commit_data.get("parent")  # * add hint & leave incomplete
             else:
                 print(f"Error: Expected commit object, got {obj_type}")
                 return None
@@ -245,7 +257,9 @@ class BasicGit:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="A basic Git-like tool (v2)")
+    parser = argparse.ArgumentParser(
+        description="A basic Git-like tool (v2 - multiple files, log, compression)"
+    )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # 'init' command
@@ -280,9 +294,9 @@ if __name__ == "__main__":
     elif args.command == "commit":
         basic_git.commit(args.message)
     elif args.command == "status":
-        basic_git.status() # * shows the current state of uncommitted/staged changes in index & unimplemented untracked files details
+        basic_git.status()  # * shows the current state of uncommitted/staged changes in index & unimplemented untracked files details
     elif args.command == "log":
-        basic_git.log() # * shows the commit history/details including parent-child relationships
+        basic_git.log()  # * shows the commit history/details including parent-child relationships
     elif args.command is None:
         parser.print_help()
         sys.exit(1)
