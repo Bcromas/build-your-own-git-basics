@@ -136,7 +136,9 @@ class BasicGit:
         staged_files = []
         try:
             with open(self.index_file, "r") as f:
-                staged_files = [line.strip() for line in f.readlines() if line.strip()]  # Read all staged files
+                staged_files = [
+                    line.strip() for line in f.readlines() if line.strip()
+                ]  # Read all staged files
         except FileNotFoundError:
             print("No changes to commit")
             return
@@ -175,7 +177,9 @@ class BasicGit:
         commit_sha = self._hash_object(commit_string, obj_type="commit")
         self._store_object(commit_string, commit_sha, obj_type="commit")
 
-        current_branch = self._get_current_branch()
+        current_branch = (
+            self._get_current_branch()
+        )  # * add hint & leave incomplete, get & use current branch
         if current_branch:
             branch_path = os.path.join(self.heads_dir, current_branch)
             with open(branch_path, "w") as f:
@@ -186,7 +190,6 @@ class BasicGit:
 
         with open(self.index_file, "w") as f:
             f.write("")  # Clear the index after commit
-
 
     def branch(self, name=None, delete=None):
         """List, create, or delete branches."""
@@ -352,7 +355,7 @@ if __name__ == "__main__":
     elif args.command == "add":
         basic_git.add(args.path)
     elif args.command == "commit":
-        basic_git.commit(args.message) # * handle multiple files
+        basic_git.commit(args.message)  # * handle multiple files
     elif args.command == "branch":
         basic_git.branch(
             name=args.name, delete=args.delete_branch

@@ -34,8 +34,13 @@ class BasicGit:
             self.gitdir, "index"
         )  # file to (temporarily) track staged files
 
-    def init(self):
-        """Initialize a new repository."""
+    def init(self) -> None:
+        """
+        Initialize a new repository.
+
+        This command sets up the necessary directory structure (.basicgit1)
+        to begin tracking changes in the current directory.
+        """
         if os.path.exists(self.gitdir):
             print(f"Repository already exists at {self.gitdir}")
             return  # * add hint & leave incomplete
@@ -60,14 +65,19 @@ class BasicGit:
 
         print(f"Initialized empty repository in {self.gitdir}")
 
-    def _hash_object(self, data):
+    def _hash_object(self, data: str) -> str:
         """
-        Create a unique ID for the data by using SHA-1 hashing.
-        This converts any content into a fixed-length string of characters
-        used to identify and track files.
+        Generate a unique ID (SHA-1 hash) for the provided data.
 
-        Note: Methods starting with underscore (_) are considered "private" in Python.
-        This means they're helper methods called by other public methods without an underscore prefix.
+        This private helper method takes string data, encodes it, and then
+        computes its SHA-1 hash, returning the hexadecimal representation
+        of the hash.
+
+        Args:
+            data (str): The string data to be hashed.
+
+        Returns:
+            str: The hexadecimal representation of the SHA-1 hash.
         """
         encoded_data = data.encode(
             "utf-8"
@@ -76,10 +86,18 @@ class BasicGit:
             encoded_data
         ).hexdigest()  # create a unique fingerprint for this content #* add hint & leave incomplete
 
-    def _store_object(self, data, sha):
+    def _store_object(self, data: str, sha: str) -> None:
         """
-        Save content in Git's storage system using its unique ID (hash).
-        We'll organize files into folders based on the first two characters of the hash to avoid having too many files in one place.
+        Store data in the object database using its SHA-1 hash.
+
+        This private helper method saves the provided data into a file within
+        the repository's object directory. The file's name is based on the
+        SHA-1 hash of the data, and the objects are organized into subdirectories
+        based on the first two characters of the hash for efficiency.
+
+        Args:
+            data (str): The string data to be stored.
+            sha (str): The SHA-1 hash of the data, used as the filename.
         """
         obj_dir = os.path.join(
             self.objects_dir, sha[:2]
@@ -93,8 +111,16 @@ class BasicGit:
                 data
             )  # save the actual content to disk for later retrieval #* add hint & leave incomplete
 
-    def add(self, path):
-        """Add a file to be tracked."""
+    def add(self, path: str) -> None:
+        """
+        Stage a file to be tracked for the next commit.
+
+        This command adds the specified file to the staging area (index).
+        In this version, only a single file can be staged at a time.
+
+        Args:
+            path (str): The path to the file to be added.
+        """
         abs_path = os.path.abspath(path)
         if not os.path.exists(abs_path):
             print(f"Error: {path} does not exist")
@@ -106,8 +132,17 @@ class BasicGit:
 
         print(f"Added {path}")
 
-    def commit(self, message):
-        """Save the staged changes with a message for clarity."""
+    def commit(self, message: str) -> None:
+        """
+        Record changes to the repository with a message.
+
+        This operation takes the currently staged file (only a single file is
+        tracked in this version) and saves it as a new commit in the repository
+        history on the 'main' branch.
+
+        Args:
+            message (str): A description of the changes being committed.
+        """
         # Check if there's anything staged to commit by reading the index file
         try:
             with open(self.index_file, "r") as f:
@@ -166,34 +201,26 @@ if __name__ == "__main__":
     )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
-    # 'init' command
     init_parser = subparsers.add_parser("init", help="Initialize a new repository")
 
-    # 'add' command
     add_parser = subparsers.add_parser("add", help="Add file to be tracked")
     add_parser.add_argument("path", help="Path to the file")
 
-    # 'commit' command
     commit_parser = subparsers.add_parser(
-        "commit", help="Record changes to the repository"
+        "commit", help="Record changes to the repository with a message."
     )
     commit_parser.add_argument("message", help="Commit message")
 
     args = parser.parse_args()
 
-    # Initialize instance of BasicGit class
     basic_git = BasicGit()
 
     if args.command == "init":
-        basic_git.init()  # * creates a hidden folder named .basicgit1 which contains index, HEAD (has one entry for 'refs/heads/main'), objects/, & refs/heads/main
+        basic_git.init()
     elif args.command == "add":
-        basic_git.add(
-            args.path
-        )  # * adds an entry in index for the file path of the file specified
+        basic_git.add(args.path)
     elif args.command == "commit":
-        basic_git.commit(
-            args.message
-        )  # * adds dirs to objects/ one for the file specified & one for the commit message, an entry in refs/heads/main using the hash of the commit message stored in objects, clears content in index, and prints out the branch name plus the first 7 digits of the hash plus the commit message
+        basic_git.commit(args.message)
     elif args.command is None:
         parser.print_help()
         sys.exit(1)
