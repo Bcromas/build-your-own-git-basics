@@ -230,12 +230,20 @@ class BasicGit:
             "file": {staged_path: blob_sha},
         }
 
-        # Convert the commit data to text and save it with its own unique ID
-        commit_string = str(commit_data)
-        # Hash the commit string
-        commit_sha = self._hash_object(commit_string)
+        # --- Task 5.1: Represent and store the commit ---
+        # Obtain a string representation of the commit data. Generate a unique
+        # identifier for this string using a hashing function.
+        commit_string = None # YOUR CODE HERE - Get string representation of commit_data
+        if commit_string is None:
+            raise NotImplementedError("Task 5.1: Getting string representation of commit data is not implemented.")
+
+        commit_sha = None # YOUR CODE HERE - Hash the commit string
+        if commit_sha is None:
+            raise NotImplementedError("Task 5.1: Hashing the commit string is not implemented.")
+
         self._store_object(commit_string, commit_sha)  # save the commit string and hash
 
+        # task 5.2
         # Update the branch to point to this new commit
         main_branch_path = os.path.join(self.heads_dir, self.main_branch)
         with open(main_branch_path, "w") as f:
@@ -244,6 +252,7 @@ class BasicGit:
         # Show a confirmation message with the commit ID and message
         print(f"[{self.main_branch} {commit_sha[:7]}] {message}")
 
+        # task 5.3
         # Clear the index after a successful commit
         with open(self.index_file, "w") as f:
             f.write("")
