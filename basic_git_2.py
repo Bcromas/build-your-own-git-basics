@@ -398,12 +398,17 @@ class BasicGit:
                         is no parent commit or if the object is not a commit.
         """
         try:
-            # Read the object from the database using its SHA-1 hash
-            obj_type, commit_content = self._read_object(commit_sha)
-            # Check if the retrieved object is a commit
+            # --- Task 6.1: Read the commit object ---
+            # Use '_read_object' to retrieve the object type and content for the given 'commit_sha'.
+            obj_type, commit_content = self._read_object(commit_sha) # YOUR CODE HERE
+
+            # --- Task 6.2: Handle commit object ---
+            # If the 'obj_type' is "commit", parse the 'commit_content' (likely JSON)
+            # and print relevant information such as the commit SHA, timestamp, message,
+            # parent (if it exists), and the list of files with their (abbreviated) SHAs.
+            # Return the parent's SHA if found.
             if obj_type == "commit":
-                # Parse the commit content from JSON
-                commit_data = json.loads(commit_content)
+                commit_data = json.loads(commit_content) # YOUR CODE HERE
                 print(f"commit {commit_sha}")
                 print(f"Timestamp: {commit_data['timestamp']}")
                 print(f"Message: {commit_data['message']}")
@@ -418,11 +423,10 @@ class BasicGit:
                 # Return the SHA-1 hash of the parent commit
                 return commit_data.get("parent")
             else:
-                # If the object is not a commit, print an error message
                 print(f"Expected commit object, got {obj_type}")
                 return None
+
         except ValueError:
-            # Handle the case where the commit object could not be read
             print(f"Error reading commit object {commit_sha}")
             return None
 
