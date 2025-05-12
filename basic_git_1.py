@@ -256,10 +256,13 @@ class BasicGit:
         # Show a confirmation message with the commit ID and message
         print(f"[{self.main_branch} {commit_sha[:7]}] {message}")
 
-        # task 5.3
-        # Clear the index after a successful commit
-        with open(self.index_file, "w") as f:
-            f.write("")
+        # --- Task 5.3: Clear the staging area ---
+        # Open the index file and write an empty string to clear it.
+        try:
+            with open(None, "w") as f: # YOUR CODE HERE - Open index file for writing
+                f.write("") # Clear index by writing empty string
+        except Exception as e:
+            raise NotImplementedError(f"Task 5.3: Clearing the staging area encountered an error: {e}")
 
 
 if __name__ == "__main__":
