@@ -53,9 +53,15 @@ class BasicGit:
         os.makedirs(self.objects_dir, exist_ok=True)
         os.makedirs(self.heads_dir, exist_ok=True)
 
-        # Create a HEAD file that points to our main branch
-        with open(self.HEAD_file, "w") as f:
-            f.write(f"ref: refs/heads/{self.main_branch}")
+        # --- Task 1: Create a symbolic HEAD reference ---
+        # Create a 'HEAD' file in the repository's directory.
+        # Write a symbolic reference within this file that indicates the
+        # currently active branch. This reference should point to the
+        # head reference of the main branch. The format for a symbolic
+        # reference starts with 'ref:' followed by the path to the
+        # referenced file.
+        with open(self.HEAD_file, "w") as f: # YOUR CODE HERE - Replace None
+            f.write(f"ref: refs/heads/{self.main_branch}") # YOUR CODE HERE - Replace None
 
         # Create an empty main branch file
         main_branch_path = os.path.join(self.heads_dir, self.main_branch)
