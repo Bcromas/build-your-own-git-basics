@@ -243,10 +243,15 @@ class BasicGit:
 
         self._store_object(commit_string, commit_sha)  # save the commit string and hash
 
-        # Update the branch to point to this new commit
-        main_branch_path = os.path.join(self.heads_dir, self.main_branch)
-        with open(main_branch_path, "w") as f:
-            f.write(commit_sha)  # point the branch to the new commit
+        # --- Task 5.2: Update the branch pointer ---
+        # Construct the reference to the current branch. Open this reference
+        # and update it to point to the newly created commit.
+        main_branch_path = os.path.join(self.heads_dir, self.main_branch) # YOUR CODE HERE - Construct branch reference path
+        try:
+            with open(main_branch_path, "w") as f: # YOUR CODE HERE - Open branch reference for writing
+                f.write(commit_sha)  # YOUR CODE HERE - Write the new commit hash
+        except Exception as e:
+            raise NotImplementedError(f"Task 5.2: Updating the branch pointer encountered an error: {e}")
 
         # Show a confirmation message with the commit ID and message
         print(f"[{self.main_branch} {commit_sha[:7]}] {message}")
