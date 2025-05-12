@@ -139,12 +139,28 @@ class BasicGit:
             path (str): The path to the file to be added.
         """
         abs_path = os.path.abspath(path)
-        if not os.path.exists(abs_path):
+
+        # --- Task 2.1: Check if the absolute path exists ---
+        # Check if the file specified by the absolute path ('abs_path') exists.
+        # If it does not exist, print an error message and return.
+        path_exists = None # YOUR CODE HERE
+        if path_exists is None:
+            raise NotImplementedError(
+                "Task 2.1: Checking if the specified path exists is not implemented."
+            )
+        if not path_exists:
             print(f"Error: {path} does not exist")
             return
 
-        with open(self.index_file, "w") as f:
-            f.write(path)  # Write the file path to the index
+        # --- Task 2.2: Write the absolute path to the index file ---
+        # Open the index file and write the absolute path of the staged file into it.
+        try:
+            with open(None, "w") as f: # YOUR CODE HERE
+                f.write(None) # YOUR CODE HERE
+        except Exception as e:
+            raise NotImplementedError(
+                f"Task 2.2: Writing the path to the index file encountered an error: {e}"
+            )
 
         print(f"Added {path}")
 
