@@ -133,13 +133,21 @@ class BasicGit:
             data (str): The string data to be stored.
             sha (str): The SHA-1 hash of the data, used as the filename.
         """
-        obj_dir = os.path.join(
-            self.objects_dir, sha[:2]
-        )  # use first 2 characters of hash as folder name
-        obj_path = os.path.join(obj_dir, sha[2:])  # use rest of hash as the filename
-        os.makedirs(obj_dir, exist_ok=True)  # create the folder if it doesn't exist
-        with open(obj_path, "w") as f:  # open a file to save the content
-            f.write(data)  # save the actual content to disk for later retrieval
+        # --- Task 4.1: Construct the object directory path ---
+        # Use 'self.objects_dir' and the first two characters of 'sha'.
+        obj_dir = os.path.join(self.objects_dir, sha[:2]) # YOUR CODE HERE
+        if obj_dir is None:
+            raise NotImplementedError("Task 4.1: Constructing the object directory path is not implemented.")
+
+        # --- Task 4.2: Construct the object file path ---
+        # Use the 'obj_dir' and the remaining characters of 'sha'.
+        obj_path = os.path.join(obj_dir, sha[2:]) # YOUR CODE HERE
+        if obj_path is None:
+            raise NotImplementedError("Task 4.2: Constructing the object file path is not implemented.")
+
+        os.makedirs(obj_dir, exist_ok=True)
+        with open(obj_path, "w") as f:
+            f.write(data)
 
     def add(self, path: str) -> None:
         """
