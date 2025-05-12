@@ -359,16 +359,19 @@ class BasicGit:
         staging area. This version does not yet track unstaged changes or
         list untracked files.
         """
+        # --- Task 5: List staged files ---
+        # Read the index file to get the list of staged files.
+        # If the index file doesn't exist, treat the staged list as empty.
+        # Finally, print the staged files to the console.
         try:
-            with open(self.index_file, "r") as f:
-                staged_files = [line.strip() for line in f if line.strip()]
+            with open(None, "r") as f: # YOUR CODE HERE
+                staged_files = None # YOUR CODE HERE
         except FileNotFoundError:
             staged_files = []
 
         print("Changes to be committed:")
         if staged_files:
-            for file in staged_files:
-                print(f"  staged:   {file}")
+            pass # YOUR CODE HERE
         else:
             print("  (no changes staged)")
 
