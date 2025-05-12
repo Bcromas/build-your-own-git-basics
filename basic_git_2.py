@@ -91,14 +91,44 @@ class BasicGit:
         Returns:
             str: The hexadecimal representation of the SHA-1 hash.
         """
-        encoded_data = data.encode(
-            "utf-8"
-        )  # convert the text to computer-friendly format
-        header = f"{obj_type} {len(encoded_data)}\0".encode("utf-8")
-        store = header + encoded_data
-        return hashlib.sha1(
-            store
-        ).hexdigest()  # create a unique fingerprint for this content
+        # --- Task 3.1: Encode data to bytes ---
+        # The 'hashlib' library requires bytes. Encode the input 'data' using UTF-8
+        # and store the result in 'encoded_data'.
+        encoded_data = None  # convert the text to computer-friendly format # YOUR CODE HERE
+        if encoded_data is None:
+            raise NotImplementedError(
+                "Task 3.1: Encode the data to bytes using UTF-8."
+            )
+
+        # --- Task 3.2: Construct the header ---
+        # Create the header string by formatting the object type and the length of
+        # the encoded data, and then encode this header string to bytes using UTF-8.
+        # Store the result in 'header'.
+        header = None # YOUR CODE HERE
+        if header is None:
+            raise NotImplementedError(
+                "Task 3.2: Construct the header string and encode it to bytes."
+            )
+
+        # --- Task 3.3: Concatenate header and encoded data ---
+        # Concatenate the 'header' and 'encoded_data' to form the complete data to be hashed.
+        # Store the result in 'store'.
+        store = None # YOUR CODE HERE
+        if store is None:
+            raise NotImplementedError(
+                "Task 3.3: Concatenate the header and encoded data."
+            )
+
+        # --- Task 3.4: Compute SHA-1 hash as hexadecimal ---
+        # Use 'hashlib.sha1()' to hash 'store'. Then, get the hex digest
+        # using '.hexdigest()' and store it in 'hex_hash'.
+        hash_object = None # YOUR CODE HERE
+        hex_hash = None  # create a unique fingerprint for this content # YOUR CODE HERE
+        if hex_hash is None:
+            raise NotImplementedError(
+                "Task 3.4: Compute the SHA-1 hash and return its hexadecimal representation."
+            )
+        return hex_hash
 
     def _store_object(self, data: str, sha: str, obj_type: str = "blob") -> None:
         """
