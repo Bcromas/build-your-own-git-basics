@@ -147,19 +147,37 @@ class BasicGit:
             obj_type (str, optional): The type of the object ('blob' or 'commit').
                 Defaults to "blob".
         """
-        obj_dir = os.path.join(
-            self.objects_dir, sha[:2]
-        )  # use first 2 characters of hash as folder name
-        obj_path = os.path.join(obj_dir, sha[2:])  # use rest of hash as the filename
+        # --- Task 4.1: Construct the object directory path ---
+        # Use 'self.objects_dir' and the first two characters of 'sha' to
+        # create the directory path where the object will be stored.
+        obj_dir = os.path.join(self.objects_dir, sha[:2]) # YOUR CODE HERE
+        if obj_dir is None:
+            raise NotImplementedError("Task 4.1: Constructing the object directory path is not implemented.")
+
+        # --- Task 4.2: Construct the object file path ---
+        # Use the 'obj_dir' and the remaining characters of 'sha' to
+        # create the full path to the object file.
+        obj_path = os.path.join(obj_dir, sha[2:]) # YOUR CODE HERE
+        if obj_path is None:
+            raise NotImplementedError("Task 4.2: Constructing the object file path is not implemented.")
+
         os.makedirs(obj_dir, exist_ok=True)  # create the folder if it doesn't exist
-        # storing as blob with header and compressed
-        compressed_data = zlib.compress(
-            f"{obj_type} {len(data)}\0{data}".encode("utf-8")
-        )
-        with open(obj_path, "wb") as f:  # open a file to save the compressed content
-            f.write(
-                compressed_data
-            )  # save the compressed content to disk for later retrieval
+
+        # --- Task 4.3: Compress the data with header ---
+        # Construct the data to be stored by prepending a header containing the object
+        # type and data length, separated by a null byte.  Compress this data using
+        # 'zlib.compress()' and store the result in 'compressed_data'.
+        compressed_data = zlib.compress(f"{obj_type} {len(data)}\0{data}".encode("utf-8")) # YOUR CODE HERE
+        if compressed_data is None:
+            raise NotImplementedError("Task 4.3: Compressing the data with a header is not implemented.")
+
+        # --- Task 4.4: Write the compressed data to the object file ---
+        # Open the file specified by 'obj_path' in binary write mode ('wb') and
+        # write the compressed data ('compressed_data') to the file.
+        # No return value
+        with open(obj_path, "wb") as f: # YOUR CODE HERE
+            f.write(compressed_data) # YOUR CODE HERE
+
 
     def _read_object(self, sha: str) -> tuple[str, str]:
         """
