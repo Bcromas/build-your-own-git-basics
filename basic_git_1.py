@@ -100,12 +100,25 @@ class BasicGit:
         Returns:
             str: The hexadecimal representation of the SHA-1 hash.
         """
-        encoded_data = data.encode(
-            "utf-8"
-        )  # convert the text to computer-friendly format
-        return hashlib.sha1(
-            encoded_data
-        ).hexdigest()  # create a unique fingerprint for this content
+        # --- Task 3.1: Encode data to bytes ---
+        # The 'hashlib' library requires bytes. Encode the input 'data' using UTF-8
+        # and store the result in 'encoded_data'.
+        encoded_data = None # YOUR CODE HERE
+        if encoded_data is None:
+            raise NotImplementedError(
+                "Task 3.1: Encode the data to bytes using UTF-8."
+            )
+
+        # --- Task 3.2: Compute SHA-1 hash as hexadecimal ---
+        # Use 'hashlib.sha1()' to hash 'encoded_data'. Then, get the hex digest
+        # using '.hexdigest()' and store it in 'hex_hash'.
+        hash_object = None # YOUR CODE HERE
+        hex_hash = None # YOUR CODE HERE
+        if hex_hash is None:
+            raise NotImplementedError(
+                "Task 3.2: Compute the SHA-1 hash and return its hexadecimal representation."
+            )
+        return hex_hash
 
     def _store_object(self, data: str, sha: str) -> None:
         """
