@@ -41,23 +41,44 @@ class BasicGit:
         This command sets up the necessary directory structure (.basicgit1)
         to begin tracking changes in the current directory.
         """
-        if os.path.exists(self.gitdir):
+        # --- Task 1.1: Check if the repository directory exists ---
+        # Check if the main repository directory already exists
+        # If it does, print a message and stop the initialization.
+        gitdir_exists = os.path.exists(self.gitdir) # YOUR CODE HERE
+        if gitdir_exists is None:
+            raise NotImplementedError(
+                "Task 1.1: Checking if the main repository directory exists is not implemented."
+            )
+        if gitdir_exists:
             print(f"Repository already exists at {self.gitdir}")
             return
 
-        # Create all the folders we need to store Git data
-        os.makedirs(self.gitdir, exist_ok=True)
-        os.makedirs(self.objects_dir, exist_ok=True)
-        os.makedirs(self.heads_dir, exist_ok=True)
+        # --- Task 1.2: Create repository directories ---
+        # Establish the foundational directory structure for the repository, ensuring that if a directory already exists, no error is raised.
+        # Hint: reference the __init__ method
+        os.makedirs(self.gitdir, exist_ok=True)  # YOUR CODE HERE - Create the main repository directory
+        os.makedirs(self.objects_dir, exist_ok=True)  # YOUR CODE HERE - Create the objects directory
+        os.makedirs(self.heads_dir, exist_ok=True)  # YOUR CODE HERE - Create the heads directory
 
-        # Create a HEAD file that points to our main branch
-        with open(self.HEAD_file, "w") as f:
-            f.write(f"refs/heads/{self.main_branch}")
+        # --- Task 1.3: Create the HEAD file ---
+        # Create a 'HEAD' file in the repository's directory.
+        # Write the path to the main branch's head reference (e.g., "refs/heads/<main/master branch name>") into this file.
+        with open(self.HEAD_file, "w") as f: # YOUR CODE HERE - Replace None
+            f.write(f"refs/heads/{self.main_branch}") # YOUR CODE HERE - Replace None
 
-        # Create an empty main branch file
-        main_branch_path = os.path.join(self.heads_dir, self.main_branch)
-        with open(main_branch_path, "w") as f:
-            f.write("")  # Start with no commits
+        # --- Task 1.4: Create the main branch file ---
+        # Create a file representing the main branch (e.g., 'main' or 'master')
+        # within the branch references directory ('self.heads_dir'). This file
+        # will eventually store the commit hash of the latest commit on this branch.
+        # Initialize this file as empty, indicating no commits yet.
+        main_branch_path = os.path.join(self.heads_dir, self.main_branch) # YOUR CODE HERE - Construct the path to the main branch file
+        try:
+            with open(main_branch_path, "w") as f: # YOUR CODE HERE - Open the main branch file in write mode
+                f.write("")  # Start with no commits
+        except Exception as e:
+            raise NotImplementedError(
+                f"Task 1.4: Creating the main branch file encountered an error: {e}"
+            )
 
         # Create an empty index file to track staged files
         with open(self.index_file, "w") as f:
