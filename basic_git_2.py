@@ -179,10 +179,30 @@ class BasicGit:
         with open(self.index_file, "a") as f:
             for path in paths:
                 abs_path = os.path.abspath(path)
-                if not os.path.exists(abs_path):
+
+                # --- Task 2.1: Check if the absolute path exists ---
+                # Check if the file or directory specified by the absolute path ('abs_path') exists.
+                # If it does not exist, print an error message and continue to the next path.
+                path_exists = os.path.exists(abs_path) # YOUR CODE HERE
+                if path_exists is None:
+                    raise NotImplementedError(
+                        "Task 2.1: Checking if the specified path exists is not implemented."
+                    )
+                if not path_exists:
                     print(f"Error: {path} does not exist")
-                    continue  # Continue to process other paths
-                f.write(path + "\n")  # Append the file path and a newline to the index
+                    continue
+
+                # --- Task 2.2: Append the original path to the index file ---
+                # Open the index file in append mode and write the *original* (not absolute)
+                # path to the file, followed by a newline character.
+                try:
+                    with open(self.index_file, "a") as f: # YOUR CODE HERE
+                        f.write(path + "\n") # YOUR CODE HERE
+                except Exception as e:
+                    raise NotImplementedError(
+                        f"Task 2.2: Appending the path to the index file encountered an error: {e}"
+                    )
+
                 print(f"Added {path}")
 
     def _get_current_commit(self) -> str | None:
