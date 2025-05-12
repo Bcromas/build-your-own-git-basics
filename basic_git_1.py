@@ -16,17 +16,17 @@ class BasicGit:
         )  # get the full folder path where our code lives
         self.gitdir = os.path.join(
             self.root_path, ".basicgit1"
-        )  # create a hidden folder to store all Git data #* add hint & leave incomplete
+        )  # create a hidden folder to store all Git data
         self.refs_dir = os.path.join(
             self.gitdir, "refs"
-        )  # directory for organizing references #* add hint & leave incomplete
+        )  # directory for organizing references
         self.heads_dir = os.path.join(
             self.refs_dir, "heads"
-        )  # directory to store the tip of the main development line  #* add hint & leave incomplete
+        )  # directory to store the tip of the main development line
         self.HEAD_file = os.path.join(
             self.gitdir, "HEAD"
         )  # file indicating the currently active branch
-        self.main_branch = "main"  # the default name for the initial branch #* add hint & leave incomplete
+        self.main_branch = "main"  # the default name for the initial branch
         self.objects_dir = os.path.join(
             self.gitdir, "objects"
         )  # directory to store all committed objects
@@ -43,21 +43,21 @@ class BasicGit:
         """
         if os.path.exists(self.gitdir):
             print(f"Repository already exists at {self.gitdir}")
-            return  # * add hint & leave incomplete
+            return
 
         # Create all the folders we need to store Git data
-        os.makedirs(self.gitdir, exist_ok=True)  # * add hint & leave incomplete
-        os.makedirs(self.objects_dir, exist_ok=True)  # * add hint & leave incomplete
-        os.makedirs(self.heads_dir, exist_ok=True)  # * add hint & leave incomplete
+        os.makedirs(self.gitdir, exist_ok=True)
+        os.makedirs(self.objects_dir, exist_ok=True)
+        os.makedirs(self.heads_dir, exist_ok=True)
 
         # Create a HEAD file that points to our main branch
         with open(self.HEAD_file, "w") as f:
-            f.write(f"refs/heads/{self.main_branch}")  # * add hint & leave incomplete
+            f.write(f"refs/heads/{self.main_branch}")
 
-        # Create an empty main branch file - it's empty because we haven't saved any changes yet
+        # Create an empty main branch file
         main_branch_path = os.path.join(self.heads_dir, self.main_branch)
         with open(main_branch_path, "w") as f:
-            f.write("")  # Start with no commits #* add hint & leave incomplete
+            f.write("")  # Start with no commits
 
         # Create an empty index file to track staged files
         with open(self.index_file, "w") as f:
@@ -81,10 +81,10 @@ class BasicGit:
         """
         encoded_data = data.encode(
             "utf-8"
-        )  # convert the text to computer-friendly format #* add hint & leave incomplete
+        )  # convert the text to computer-friendly format
         return hashlib.sha1(
             encoded_data
-        ).hexdigest()  # create a unique fingerprint for this content #* add hint & leave incomplete
+        ).hexdigest()  # create a unique fingerprint for this content
 
     def _store_object(self, data: str, sha: str) -> None:
         """
@@ -101,15 +101,11 @@ class BasicGit:
         """
         obj_dir = os.path.join(
             self.objects_dir, sha[:2]
-        )  # use first 2 characters of hash as folder name #* add hint & leave incomplete
-        obj_path = os.path.join(
-            obj_dir, sha[2:]
-        )  # use rest of hash as the filename #* add hint & leave incomplete
+        )  # use first 2 characters of hash as folder name
+        obj_path = os.path.join(obj_dir, sha[2:])  # use rest of hash as the filename
         os.makedirs(obj_dir, exist_ok=True)  # create the folder if it doesn't exist
         with open(obj_path, "w") as f:  # open a file to save the content
-            f.write(
-                data
-            )  # save the actual content to disk for later retrieval #* add hint & leave incomplete
+            f.write(data)  # save the actual content to disk for later retrieval
 
     def add(self, path: str) -> None:
         """
@@ -126,9 +122,8 @@ class BasicGit:
             print(f"Error: {path} does not exist")
             return
 
-        # Store the path of the added file in the index file
         with open(self.index_file, "w") as f:
-            f.write(path)
+            f.write(path)  # Write the file path to the index
 
         print(f"Added {path}")
 
@@ -146,9 +141,10 @@ class BasicGit:
         # Check if there's anything staged to commit by reading the index file
         try:
             with open(self.index_file, "r") as f:
+                # Read the content of the index file and remove any leading/trailing whitespace
                 staged_path = f.read().strip()
         except FileNotFoundError:
-            print("No changes to commit")
+            print("No changes staged for commit. The staging area is empty or missing.")
             return
 
         if not staged_path:
@@ -157,7 +153,7 @@ class BasicGit:
 
         abs_staged_path = os.path.abspath(staged_path)
         if not os.path.exists(abs_staged_path):
-            print(f"Error: Staged file '{staged_path}' not found.")
+            print(f"Staged file '{staged_path}' not found. Clearing the index.")
             # Clear the index
             with open(self.index_file, "w") as f:
                 f.write("")

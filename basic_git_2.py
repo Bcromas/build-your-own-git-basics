@@ -18,17 +18,17 @@ class BasicGit:
         )  # get the full folder path where our code lives
         self.gitdir = os.path.join(
             self.root_path, ".basicgit2"
-        )  # create a hidden folder to store all Git data #* add hint & leave incomplete
+        )  # create a hidden folder to store all Git data
         self.refs_dir = os.path.join(
             self.gitdir, "refs"
-        )  # directory for organizing references #* add hint & leave incomplete
+        )  # directory for organizing references
         self.heads_dir = os.path.join(
             self.refs_dir, "heads"
-        )  # directory to store the tip of the main development line as a file containing its latest commit SHA #* add hint & leave incomplete
+        )  # directory to store the tip of the main development line as a file containing its latest commit SHA
         self.HEAD_file = os.path.join(
             self.gitdir, "HEAD"
         )  # file indicating the currently active branch
-        self.main_branch = "main"  # the default name for the initial branch #* add hint & leave incomplete
+        self.main_branch = "main"  # the default name for the initial branch
         self.objects_dir = os.path.join(
             self.gitdir, "objects"
         )  # directory to store all committed objects
@@ -55,9 +55,7 @@ class BasicGit:
 
         # Create a HEAD file that points to our main branch
         with open(self.HEAD_file, "w") as f:
-            f.write(
-                f"ref: refs/heads/{self.main_branch}"
-            )  # * implement symbolic reference where the commit SHA is stored in a branch's file, helpful for implementing branching later
+            f.write(f"ref: refs/heads/{self.main_branch}")
 
         # Create an empty main branch file
         main_branch_path = os.path.join(self.heads_dir, self.main_branch)
@@ -90,13 +88,11 @@ class BasicGit:
         encoded_data = data.encode(
             "utf-8"
         )  # convert the text to computer-friendly format
-        header = f"{obj_type} {len(encoded_data)}\0".encode(
-            "utf-8"
-        )  # * add hint & leave incomplete
+        header = f"{obj_type} {len(encoded_data)}\0".encode("utf-8")
         store = header + encoded_data
         return hashlib.sha1(
             store
-        ).hexdigest()  # create a unique fingerprint for this content #* add hint & leave incomplete
+        ).hexdigest()  # create a unique fingerprint for this content
 
     def _store_object(self, data: str, sha: str, obj_type: str = "blob") -> None:
         """
@@ -123,10 +119,11 @@ class BasicGit:
         # storing as blob with header and compressed
         compressed_data = zlib.compress(
             f"{obj_type} {len(data)}\0{data}".encode("utf-8")
-        )  # * add hint & leave incomplete
-        # save the compressed content to disk for later retrieval
-        with open(obj_path, "wb") as f:
-            f.write(compressed_data)  # * add hint & leave incomplete
+        )
+        with open(obj_path, "wb") as f:  # open a file to save the compressed content
+            f.write(
+                compressed_data
+            )  # save the compressed content to disk for later retrieval
 
     def _read_object(self, sha: str) -> tuple[str, str]:
         """
@@ -153,12 +150,10 @@ class BasicGit:
             raise ValueError(f"Object {sha} not found")
         with open(obj_path, "rb") as f:  # use binary read mode
             compressed = f.read()
-        decompressed = zlib.decompress(compressed).decode(
-            "utf-8"
-        )  # * add hint & leave incomplete
-        null_index = decompressed.find("\0")  # * add hint & leave incomplete
-        header = decompressed[:null_index]  # * add hint & leave incomplete
-        content = decompressed[null_index + 1 :]  # * add hint & leave incomplete
+        decompressed = zlib.decompress(compressed).decode("utf-8")
+        null_index = decompressed.find("\0")
+        header = decompressed[:null_index]
+        content = decompressed[null_index + 1 :]
         obj_type, size = header.split()
         return obj_type, content
 
@@ -180,8 +175,8 @@ class BasicGit:
                 abs_path = os.path.abspath(path)
                 if not os.path.exists(abs_path):
                     print(f"Error: {path} does not exist")
-                    continue
-                f.write(path + "\n")  # * add hint & leave incomplete
+                    continue  # Continue to process other paths
+                f.write(path + "\n")  # Append the file path and a newline to the index
                 print(f"Added {path}")
 
     def _get_current_commit(self) -> str | None:
@@ -197,11 +192,13 @@ class BasicGit:
                         or None if the 'main' branch file does not exist
                         (e.g., in a newly initialized repository with no commits).
         """
-        main_branch_path = os.path.join(
-            self.heads_dir, self.main_branch
-        )  # * add hint & leave incomplete
+        # Get the full path to the 'main' branch file
+        main_branch_path = os.path.join(self.heads_dir, self.main_branch)
+        # Check if the 'main' branch file exists
         if os.path.exists(main_branch_path):
+            # Open the 'main' branch file in read mode
             with open(main_branch_path, "r") as f:
+                # Read the commit SHA from the file and strip leading/trailing whitespace
                 return f.read().strip()
         return None
 
@@ -217,15 +214,15 @@ class BasicGit:
         Args:
             message (str): A description of the changes being committed.
         """
-        # Check if there's anything staged to commit by reading the index file
         staged_files = []
+        # Check if there's anything staged to commit by reading the index file
         try:
             with open(self.index_file, "r") as f:
-                staged_files = [
-                    line.strip() for line in f.readlines() if line.strip()
-                ]  # Read all staged files
+                # Read all lines from the index file, strip whitespace from each,
+                # and keep only the non-empty lines (representing staged files)
+                staged_files = [line.strip() for line in f.readlines() if line.strip()]
         except FileNotFoundError:
-            print("No changes to commit")
+            print("No changes staged for commit. The staging area is empty or missing.")
             return
 
         if not staged_files:
@@ -236,13 +233,16 @@ class BasicGit:
         for staged_path in staged_files:
             abs_staged_path = os.path.abspath(staged_path)
             if not os.path.exists(abs_staged_path):
-                print(f"Error: Staged file '{staged_path}' not found.")
+                print(
+                    f"Staged file '{staged_path}' not found. Continuing with next file."
+                )
                 continue  # Skip missing files, process the rest
             try:
                 with open(abs_staged_path, "r") as f:
                     content = f.read()
+                # Create a "blob" by hashing the content
                 blob_sha = self._hash_object(content)
-                self._store_object(content, blob_sha)
+                self._store_object(content, blob_sha)  # save the content
                 files_to_commit[staged_path] = blob_sha
             except Exception as e:
                 print(f"Error processing file '{staged_path}': {e}")
@@ -259,15 +259,21 @@ class BasicGit:
         }
 
         commit_string = json.dumps(commit_data)
+        # Hash the commit string
         commit_sha = self._hash_object(commit_string, obj_type="commit")
-        self._store_object(commit_string, commit_sha, obj_type="commit")
+        self._store_object(
+            commit_string, commit_sha, obj_type="commit"
+        )  # save the commit string and hash
 
+        # Update the branch to point to this new commit
         main_branch_path = os.path.join(self.heads_dir, self.main_branch)
         with open(main_branch_path, "w") as f:
-            f.write(commit_sha)
+            f.write(commit_sha)  # point the branch to the new commit
 
+        # Show a confirmation message with the commit ID and message
         print(f"[{self.main_branch} {commit_sha[:7]}] {message}")
 
+        # Clear the index after a successful commit
         with open(self.index_file, "w") as f:
             f.write("")
 
@@ -282,9 +288,7 @@ class BasicGit:
         """
         try:
             with open(self.index_file, "r") as f:
-                staged_files = [
-                    line.strip() for line in f if line.strip()
-                ]  # * add hint & leave incomplete
+                staged_files = [line.strip() for line in f if line.strip()]
         except FileNotFoundError:
             staged_files = []
 
@@ -316,23 +320,31 @@ class BasicGit:
                         is no parent commit or if the object is not a commit.
         """
         try:
+            # Read the object from the database using its SHA-1 hash
             obj_type, commit_content = self._read_object(commit_sha)
+            # Check if the retrieved object is a commit
             if obj_type == "commit":
+                # Parse the commit content from JSON
                 commit_data = json.loads(commit_content)
                 print(f"commit {commit_sha}")
                 print(f"Timestamp: {commit_data['timestamp']}")
                 print(f"Message: {commit_data['message']}")
+                # Check if the commit has a parent commit
                 if "parent" in commit_data and commit_data["parent"]:
                     print(f"Parent: {commit_data['parent']}")
                 print("Files:")
+                # Iterate through the files included in this commit
                 for file, sha in commit_data.get("files", {}).items():
                     print(f"  {file}: {sha[:7]}")
                 print("")
-                return commit_data.get("parent")  # * add hint & leave incomplete
+                # Return the SHA-1 hash of the parent commit
+                return commit_data.get("parent")
             else:
-                print(f"Error: Expected commit object, got {obj_type}")
+                # If the object is not a commit, print an error message
+                print(f"Expected commit object, got {obj_type}")
                 return None
         except ValueError:
+            # Handle the case where the commit object could not be read
             print(f"Error reading commit object {commit_sha}")
             return None
 
@@ -345,13 +357,18 @@ class BasicGit:
         by calling the '_log_commit' method. It continues until the initial
         commit or the beginning of the history is reached.
         """
+        # Get the SHA-1 hash of the most recent commit on the 'main' branch
         current_commit = self._get_current_commit()
+        # If there are no commits yet, inform the user and exit
         if not current_commit:
             print("No commits yet.")
             return
 
+        # Loop through the commit history, starting from the current commit
         while current_commit:
+            # Display the details of the current commit and get the SHA-1 hash of its parent
             current_commit = self._log_commit(current_commit)
+            # The loop continues with the parent commit until there are no more parents (None is returned)
 
 
 if __name__ == "__main__":
